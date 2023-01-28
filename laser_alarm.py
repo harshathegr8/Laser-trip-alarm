@@ -6,7 +6,7 @@ import network
 class var:
     def __init__(self):
         self.val = 0
-s,blys,p,bly = var(),var(),var(),var()
+s,blys,p,res = var(),var(),var(),var()
 #https://community.blynk.cc/t/micropython-and-blynk-2-0-libary/53861
 # https://github.com/lemariva/uPyBlynk/blob/master/BlynkLibWiPy.py
 
@@ -32,11 +32,15 @@ def my_write_handler(value):
     x = value[0]
     blys.val = int(x)+1
     blynk.virtual_write(1,x)
-
+def my_write_handler2(value):
+    print('Current V2 value: {}'.format(value))
+    res.val = 1
+    
 def initial():
     blynk.sync_virtual(0)
 blynk.on('connected',initial)
 blynk.on('V0',my_write_handler)
+blynk.on('V2',my_write_handler2)
 print(wlan.isconnected())
 
 
@@ -63,7 +67,21 @@ def alarm():
             pass
         buzz.value(0)
         r.value(0),g.value(1),b.value(1)
-   
+    elif res.val ==1:
+        res.val =0
+        if s.val ==1:
+            return
+        t.deinit()
+        buzz.value(0)
+        p.val = 0
+        try:
+            blynk.virtual_write(3,'Clear')
+        except:
+            pass
+        r.value(0),g.value(1),b.value(0)
+        sleep(0.1)
+        if s.val==2:
+            r.value(1),g.value(0),b.value(1)
     elif blys.val ==2:
         s.val = 2
         r.value(1),g.value(0),b.value(1)
